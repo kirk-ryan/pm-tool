@@ -127,10 +127,10 @@
 **Objective:** Enable backend AI calls via OpenRouter, test with simple query.
 
 **Substeps:**
-- [ ] Set up OpenRouter client in backend using OPENROUTER_API_KEY.
-- [ ] Add API route for AI test: POST /api/ai/test with simple prompt (e.g., "2+2").
-- [ ] Verify response from openai/gpt-oss-120b model.
-- [ ] Handle errors (API key, network).
+- [x] Set up OpenRouter client in backend using OPENROUTER_API_KEY.
+- [x] Add API route for AI test: POST /api/ai/test with simple prompt (e.g., "2+2").
+- [x] Verify response from openai/gpt-oss-120b model.
+- [x] Handle errors (API key, network).
 
 **Tests:**
 - Unit: AI client functions tested.

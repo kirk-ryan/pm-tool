@@ -6,6 +6,8 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi",
     "uvicorn[standard]",
+    "openai",
+    "python-dotenv",
 ]
 
 [dependency-groups]

@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 
 
@@ -142,3 +143,75 @@ def test_set_and_get_board_roundtrip(tmp_path):
     payload = {"columns": [{"id": "x", "title": "X", "cardIds": []}], "cards": {}}
     set_board("user", payload, path)
     assert get_board("user", path) == payload
+
+
+# ── POST /api/ai/test ─────────────────────────────────────────────────────────
+
+def test_ai_test_returns_response(tmp_path):
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_query", return_value="4") as mock_query:
+        response = client.post("/api/ai/test", json={"prompt": "2+2"})
+    assert response.status_code == 200
+    assert response.json() == {"response": "4"}
+    mock_query.assert_called_once_with("2+2")
+
+
+def test_ai_test_uses_default_prompt(tmp_path):
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_query", return_value="4"):
+        response = client.post("/api/ai/test", json={})
+    assert response.status_code == 200
+    assert "response" in response.json()
+
+
+def test_ai_test_missing_api_key_returns_500(tmp_path):
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_query", side_effect=ValueError("OPENROUTER_API_KEY environment variable is not set")):
+        response = client.post("/api/ai/test", json={"prompt": "hello"})
+    assert response.status_code == 500
+    assert "OPENROUTER_API_KEY" in response.json()["detail"]
+
+
+def test_ai_test_network_error_returns_502(tmp_path):
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_query", side_effect=RuntimeError("connection refused")):
+        response = client.post("/api/ai/test", json={"prompt": "hello"})
+    assert response.status_code == 502
+    assert response.json()["detail"] == "AI service unavailable"
+
+
+# ── ai module unit tests ──────────────────────────────────────────────────────
+
+def test_ai_query_calls_openai_client(monkeypatch):
+    import ai as ai_module
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    mock_response = MagicMock()
+    mock_response.choices[0].message.content = "4"
+
+    mock_client = MagicMock()
+    mock_client.chat.completions.create.return_value = mock_response
+
+    with patch.object(ai_module, "get_client", return_value=mock_client):
+        result = ai_module.ai_query("2+2")
+
+    assert result == "4"
+    mock_client.chat.completions.create.assert_called_once_with(
+        model=ai_module.MODEL,
+        messages=[{"role": "user", "content": "2+2"}],
+    )
+
+
+def test_get_client_raises_without_api_key(monkeypatch):
+    import ai as ai_module
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    with pytest.raises(ValueError, match="OPENROUTER_API_KEY"):
+        ai_module.get_client()
+
+
+def test_get_client_uses_openrouter_base_url(monkeypatch):
+    import ai as ai_module
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    client = ai_module.get_client()
+    assert "openrouter.ai" in str(client.base_url)
