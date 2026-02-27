@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run test:unit)",
+      "Bash(npx vitest run)",
+      "Bash(npm ci)",
+      "Bash(./node_modules/.bin/vitest run)",
+      "Bash(bash scripts/start.sh)",
+      "Bash(docker --version)",
+      "Bash(uv run pytest tests/ -v)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(pip install pytest httpx fastapi)",
+      "Bash(npm install)",
+      "Bash(python -m pytest backend/tests/ -v)"
+    ]
+  }
+}

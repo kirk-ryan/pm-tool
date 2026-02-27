@@ -57,13 +57,13 @@
 **Objective:** Add login page requiring dummy credentials ("user", "password"), logout functionality, with comprehensive tests.
 
 **Substeps:**
-- [ ] Create login page component in frontend.
-- [ ] Add authentication state management (hardcoded check).
-- [ ] Protect Kanban board behind login; redirect to login if not authenticated.
-- [ ] Add logout button/functionality.
-- [ ] Update routing to handle login flow.
-- [ ] Add unit tests for login logic.
-- [ ] Add e2e tests for login/logout flow.
+- [x] Create login page component in frontend.
+- [x] Add authentication state management (hardcoded check).
+- [x] Protect Kanban board behind login; redirect to login if not authenticated.
+- [x] Add logout button/functionality.
+- [x] Update routing to handle login flow.
+- [x] Add unit tests for login logic.
+- [x] Add e2e tests for login/logout flow.
 
 **Tests:**
 - Unit: Authentication functions work correctly.
@@ -77,11 +77,11 @@
 **Objective:** Propose and document database schema for Kanban data stored as JSON. Get user sign-off.
 
 **Substeps:**
-- [ ] Analyze frontend data structures (BoardData, Card, Column).
-- [ ] Design SQLite schema/tables for users, boards, columns, cards.
-- [ ] Document schema in docs/DATABASE.md, including JSON storage approach.
-- [ ] Create sample database with initial data.
-- [ ] Present to user for approval.
+- [x] Analyze frontend data structures (BoardData, Card, Column).
+- [x] Design SQLite schema/tables for users, boards, columns, cards.
+- [x] Document schema in docs/DATABASE.md, including JSON storage approach.
+- [x] Create sample database with initial data.
+- [x] Present to user for approval.
 
 **Tests:** Manual review of schema design.
 
@@ -92,11 +92,10 @@
 **Objective:** Add API routes for reading/changing Kanban data per user, with thorough backend unit tests. Database created if needed.
 
 **Substeps:**
-- [ ] Implement SQLite database setup in backend.
-- [ ] Add API routes: GET /api/board/{user_id}, PUT /api/board/{user_id} for full board updates.
-- [ ] Add routes for specific operations (add card, move card, etc.) if needed.
-- [ ] Ensure database initializes with schema on first run.
-- [ ] Write comprehensive unit tests for all routes and database operations.
+- [x] Implement SQLite database setup in backend.
+- [x] Add API routes: GET /api/board, PUT /api/board for full board updates.
+- [x] Ensure database initializes with schema on first run.
+- [x] Write comprehensive unit tests for all routes and database operations.
 
 **Tests:**
 - Unit: All API routes tested with mocked DB, database CRUD operations tested.

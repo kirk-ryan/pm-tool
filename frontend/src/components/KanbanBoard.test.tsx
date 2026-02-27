@@ -1,17 +1,29 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { AuthProvider } from "@/lib/auth";
 import { KanbanBoard } from "@/components/KanbanBoard";
+
+const renderBoard = () =>
+  render(
+    <AuthProvider>
+      <KanbanBoard />
+    </AuthProvider>
+  );
 
 const getFirstColumn = () => screen.getAllByTestId(/column-/i)[0];
 
+beforeEach(() => {
+  sessionStorage.clear();
+});
+
 describe("KanbanBoard", () => {
   it("renders five columns", () => {
-    render(<KanbanBoard />);
+    renderBoard();
     expect(screen.getAllByTestId(/column-/i)).toHaveLength(5);
   });
 
   it("renames a column", async () => {
-    render(<KanbanBoard />);
+    renderBoard();
     const column = getFirstColumn();
     const input = within(column).getByLabelText("Column title");
     await userEvent.clear(input);
@@ -20,7 +32,7 @@ describe("KanbanBoard", () => {
   });
 
   it("adds and removes a card", async () => {
-    render(<KanbanBoard />);
+    renderBoard();
     const column = getFirstColumn();
     const addButton = within(column).getByRole("button", {
       name: /add a card/i,
@@ -42,5 +54,10 @@ describe("KanbanBoard", () => {
     await userEvent.click(deleteButton);
 
     expect(within(column).queryByText("New card")).not.toBeInTheDocument();
+  });
+
+  it("renders a sign out button", () => {
+    renderBoard();
+    expect(screen.getByRole("button", { name: /sign out/i })).toBeInTheDocument();
   });
 });
