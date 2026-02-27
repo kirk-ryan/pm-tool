@@ -5,11 +5,11 @@
 **Objective:** Enrich the plan document with detailed substeps, checklists, tests, and success criteria for each subsequent part. Create AGENTS.md in frontend/ describing existing code. Obtain user approval.
 
 **Substeps:**
-- [ ] Review existing AGENTS.md (root) and docs/PLAN.md.
-- [ ] Break down each of Parts 2-10 into detailed substeps with actionable checklists.
-- [ ] Define tests (unit, integration, e2e) and success criteria for each part.
-- [ ] Create frontend/AGENTS.md describing the existing frontend code structure, components, and functionality.
-- [ ] Present the enriched plan to the user for review and approval.
+- [x] Review existing AGENTS.md (root) and docs/PLAN.md.
+- [x] Break down each of Parts 2-10 into detailed substeps with actionable checklists.
+- [x] Define tests (unit, integration, e2e) and success criteria for each part.
+- [x] Create frontend/AGENTS.md describing the existing frontend code structure, components, and functionality.
+- [x] Present the enriched plan to the user for review and approval.
 
 **Tests:** Manual review and approval by user.
 
@@ -25,7 +25,7 @@
 - [x] Implement a basic FastAPI route serving static HTML (e.g., "Hello World") at /.
 - [x] Add a test API route (e.g., GET /api/test returning JSON).
 - [x] Create scripts/start.sh and scripts/stop.sh for Mac, PC, Linux to build/run/stop the Docker container.
-- [ ] Test locally: Run container, verify HTML served at /, API call works.
+- [x] Test locally: Run container, verify HTML served at /, API call works.
 
 **Tests:**
 - Unit: Test FastAPI routes with pytest.
@@ -108,12 +108,12 @@
 **Objective:** Connect frontend to backend API for persistent Kanban board, with thorough testing.
 
 **Substeps:**
-- [ ] Update frontend to fetch board data from API on load.
-- [ ] Implement API calls for all board operations (add, move, delete, rename).
-- [ ] Handle loading states and errors.
-- [ ] Update authentication to tie to user ID.
-- [ ] Run all existing tests against backend-connected app.
-- [ ] Add integration tests for API interactions.
+- [x] Update frontend to fetch board data from API on load.
+- [x] Implement API calls for all board operations (add, move, delete, rename).
+- [x] Handle loading states and errors.
+- [x] Update authentication to tie to user ID.
+- [x] Run all existing tests against backend-connected app.
+- [x] Add integration tests for API interactions.
 
 **Tests:**
 - Unit: API client functions tested.

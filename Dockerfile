@@ -27,5 +27,8 @@ COPY --from=frontend-builder /frontend/out ./frontend_out
 # Expose port
 EXPOSE 8000
 
+# Make backend/ importable so `from db import ...` resolves inside main.py
+ENV PYTHONPATH=/app/backend
+
 # Run
 CMD ["uv", "run", "--project", "backend", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

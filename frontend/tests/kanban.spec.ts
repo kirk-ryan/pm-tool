@@ -23,7 +23,21 @@ test("adds a card to a column", async ({ page }) => {
   await firstColumn.getByPlaceholder("Card title").fill("Playwright card");
   await firstColumn.getByPlaceholder("Details").fill("Added via e2e.");
   await firstColumn.getByRole("button", { name: /add card/i }).click();
-  await expect(firstColumn.getByText("Playwright card")).toBeVisible();
+  await expect(firstColumn.getByText("Playwright card").first()).toBeVisible();
+});
+
+test("board changes persist after page reload", async ({ page }) => {
+  const firstColumn = page.locator('[data-testid^="column-"]').first();
+  await firstColumn.getByRole("button", { name: /add a card/i }).click();
+  await firstColumn.getByPlaceholder("Card title").fill("Persist test card");
+  await firstColumn.getByPlaceholder("Details").fill("Should survive reload.");
+  await firstColumn.getByRole("button", { name: /add card/i }).click();
+  await expect(firstColumn.getByText("Persist test card").first()).toBeVisible();
+
+  // sessionStorage persists across reloads in the same tab, so the user stays logged in.
+  await page.reload();
+  await page.waitForURL("/");
+  await expect(page.locator('[data-testid^="column-"]').first().getByText("Persist test card").first()).toBeVisible();
 });
 
 test("moves a card between columns", async ({ page }) => {

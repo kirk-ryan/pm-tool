@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -13,13 +13,32 @@ import {
 } from "@dnd-kit/core";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
+<<<<<<< HEAD
 import { createId, initialData, moveCard, type BoardData } from "@/lib/kanban";
+=======
+import { createId, moveCard, type BoardData } from "@/lib/kanban";
+import { fetchBoard, saveBoard } from "@/lib/api";
+>>>>>>> wip
 import { useAuth } from "@/lib/auth";
 
 export const KanbanBoard = () => {
-  const [board, setBoard] = useState<BoardData>(() => initialData);
+  const [board, setBoard] = useState<BoardData>({ columns: [], cards: {} });
+  const [status, setStatus] = useState<"loading" | "error" | "ready">("loading");
+  const [saveError, setSaveError] = useState(false);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const { logout } = useAuth();
+<<<<<<< HEAD
+=======
+
+  useEffect(() => {
+    fetchBoard()
+      .then((data) => {
+        setBoard(data);
+        setStatus("ready");
+      })
+      .catch(() => setStatus("error"));
+  }, []);
+>>>>>>> wip
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -28,6 +47,12 @@ export const KanbanBoard = () => {
   );
 
   const cardsById = useMemo(() => board.cards, [board.cards]);
+
+  const persist = (nextBoard: BoardData) => {
+    setBoard(nextBoard);
+    setSaveError(false);
+    saveBoard(nextBoard).catch(() => setSaveError(true));
+  };
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveCardId(event.active.id as string);
@@ -41,62 +66,82 @@ export const KanbanBoard = () => {
       return;
     }
 
-    setBoard((prev) => ({
-      ...prev,
-      columns: moveCard(prev.columns, active.id as string, over.id as string),
-    }));
+    persist({
+      ...board,
+      columns: moveCard(board.columns, active.id as string, over.id as string),
+    });
   };
 
   const handleRenameColumn = (columnId: string, title: string) => {
-    setBoard((prev) => ({
-      ...prev,
-      columns: prev.columns.map((column) =>
-        column.id === columnId ? { ...column, title } : column
+    persist({
+      ...board,
+      columns: board.columns.map((c) =>
+        c.id === columnId ? { ...c, title } : c
       ),
-    }));
+    });
   };
 
   const handleAddCard = (columnId: string, title: string, details: string) => {
     const id = createId("card");
-    setBoard((prev) => ({
-      ...prev,
+    persist({
+      ...board,
       cards: {
-        ...prev.cards,
+        ...board.cards,
         [id]: { id, title, details: details || "No details yet." },
       },
-      columns: prev.columns.map((column) =>
-        column.id === columnId
-          ? { ...column, cardIds: [...column.cardIds, id] }
-          : column
+      columns: board.columns.map((c) =>
+        c.id === columnId ? { ...c, cardIds: [...c.cardIds, id] } : c
       ),
-    }));
+    });
   };
 
   const handleDeleteCard = (columnId: string, cardId: string) => {
-    setBoard((prev) => {
-      return {
-        ...prev,
-        cards: Object.fromEntries(
-          Object.entries(prev.cards).filter(([id]) => id !== cardId)
-        ),
-        columns: prev.columns.map((column) =>
-          column.id === columnId
-            ? {
-                ...column,
-                cardIds: column.cardIds.filter((id) => id !== cardId),
-              }
-            : column
-        ),
-      };
+    persist({
+      ...board,
+      cards: Object.fromEntries(
+        Object.entries(board.cards).filter(([id]) => id !== cardId)
+      ),
+      columns: board.columns.map((c) =>
+        c.id === columnId
+          ? { ...c, cardIds: c.cardIds.filter((id) => id !== cardId) }
+          : c
+      ),
     });
   };
 
   const activeCard = activeCardId ? cardsById[activeCardId] : null;
 
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-[var(--gray-text)]">Loading board…</p>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-red-500">
+          Failed to load board. Please refresh the page.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="relative overflow-hidden">
       <div className="pointer-events-none absolute left-0 top-0 h-[420px] w-[420px] -translate-x-1/3 -translate-y-1/3 rounded-full bg-[radial-gradient(circle,_rgba(32,157,215,0.25)_0%,_rgba(32,157,215,0.05)_55%,_transparent_70%)]" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-[520px] w-[520px] translate-x-1/4 translate-y-1/4 rounded-full bg-[radial-gradient(circle,_rgba(117,57,145,0.18)_0%,_rgba(117,57,145,0.05)_55%,_transparent_75%)]" />
+
+      {saveError && (
+        <div
+          role="alert"
+          className="relative z-10 mx-6 mt-4 rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700"
+        >
+          Changes could not be saved. Please check your connection and try again.
+        </div>
+      )}
 
       <main className="relative mx-auto flex min-h-screen max-w-[1500px] flex-col gap-10 px-6 pb-16 pt-12">
         <header className="flex flex-col gap-6 rounded-[32px] border border-[var(--stroke)] bg-white/80 p-8 shadow-[var(--shadow)] backdrop-blur">

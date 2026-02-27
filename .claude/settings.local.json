@@ -10,8 +10,27 @@
       "Bash(uv run pytest tests/ -v)",
       "Bash(python -m pytest tests/ -v)",
       "Bash(pip install pytest httpx fastapi)",
+<<<<<<< HEAD
       "Bash(npm install)",
       "Bash(python -m pytest backend/tests/ -v)"
+=======
+      "Bash(docker ps --filter name=pm-container --format \"{{.Names}} {{.Status}}\")",
+      "Bash(curl -s http://localhost:8000/api/board)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f''columns: {len\\(d[\"\"columns\"\"]\\)}, cards: {len\\(d[\"\"cards\"\"]\\)}''\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/api/board)",
+      "Bash(docker run -d --name pm-container -p 8000:8000 pm-app)",
+      "Bash(docker rm -f pm-container)",
+      "Bash(docker build -t pm-app .)",
+      "Bash(npx playwright test)",
+      "Bash(curl -s http://localhost:8000/login)",
+      "Bash(docker exec pm-container ls /app/frontend_out/)",
+      "Bash(docker exec pm-container //bin/ls //app/frontend_out/)",
+      "Bash(docker exec pm-container //bin/ls //app/frontend_out/login/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/login.html)",
+      "Bash(docker exec pm-container //bin/wc -c //app/frontend_out/login.html //app/frontend_out/404.html)",
+      "Bash(curl -s -o /dev/null -w \"/login:%{http_code} /api/board:%{http_code}\" http://localhost:8000/login http://localhost:8000/api/board)",
+      "Bash(npx playwright test tests/auth.spec.ts)"
+>>>>>>> wip
     ]
   }
 }

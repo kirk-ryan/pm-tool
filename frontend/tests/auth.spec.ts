@@ -20,7 +20,11 @@ test("shows error on incorrect credentials", async ({ page }) => {
   await page.getByLabel("Username").fill("admin");
   await page.getByLabel("Password").fill("wrongpassword");
   await page.getByRole("button", { name: /sign in/i }).click();
+<<<<<<< HEAD
   await expect(page.getByRole("alert")).toContainText(/invalid/i);
+=======
+  await expect(page.getByRole("alert").filter({ hasText: /invalid/i })).toBeVisible();
+>>>>>>> wip
 });
 
 test("stays on login page with wrong password for valid username", async ({ page }) => {
@@ -28,7 +32,11 @@ test("stays on login page with wrong password for valid username", async ({ page
   await page.getByLabel("Username").fill("user");
   await page.getByLabel("Password").fill("wrong");
   await page.getByRole("button", { name: /sign in/i }).click();
+<<<<<<< HEAD
   await expect(page.getByRole("alert")).toContainText(/invalid/i);
+=======
+  await expect(page.getByRole("alert").filter({ hasText: /invalid/i })).toBeVisible();
+>>>>>>> wip
   await expect(page).toHaveURL(/\/login/);
 });
 
