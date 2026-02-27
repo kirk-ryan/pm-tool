@@ -108,12 +108,12 @@
 **Objective:** Connect frontend to backend API for persistent Kanban board, with thorough testing.
 
 **Substeps:**
-- [ ] Update frontend to fetch board data from API on load.
-- [ ] Implement API calls for all board operations (add, move, delete, rename).
-- [ ] Handle loading states and errors.
-- [ ] Update authentication to tie to user ID.
-- [ ] Run all existing tests against backend-connected app.
-- [ ] Add integration tests for API interactions.
+- [x] Update frontend to fetch board data from API on load.
+- [x] Implement API calls for all board operations (add, move, delete, rename).
+- [x] Handle loading states and errors.
+- [x] Update authentication to tie to user ID.
+- [x] Run all existing tests against backend-connected app.
+- [x] Add integration tests for API interactions.
 
 **Tests:**
 - Unit: API client functions tested.

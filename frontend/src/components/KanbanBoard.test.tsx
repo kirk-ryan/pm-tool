@@ -1,7 +1,25 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
 import { AuthProvider } from "@/lib/auth";
 import { KanbanBoard } from "@/components/KanbanBoard";
+
+// vi.mock is hoisted before imports, so board data must be defined with vi.hoisted.
+const mockBoard = vi.hoisted(() => ({
+  columns: [
+    { id: "col-backlog",   title: "Backlog",      cardIds: [] },
+    { id: "col-discovery", title: "Discovery",    cardIds: [] },
+    { id: "col-progress",  title: "In Progress",  cardIds: [] },
+    { id: "col-review",    title: "Review",       cardIds: [] },
+    { id: "col-done",      title: "Done",         cardIds: [] },
+  ],
+  cards: {},
+}));
+
+vi.mock("@/lib/api", () => ({
+  fetchBoard: vi.fn().mockResolvedValue(mockBoard),
+  saveBoard: vi.fn().mockResolvedValue(undefined),
+}));
 
 const renderBoard = () =>
   render(
@@ -10,21 +28,20 @@ const renderBoard = () =>
     </AuthProvider>
   );
 
-const getFirstColumn = () => screen.getAllByTestId(/column-/i)[0];
-
 beforeEach(() => {
   sessionStorage.clear();
 });
 
 describe("KanbanBoard", () => {
-  it("renders five columns", () => {
+  it("renders five columns", async () => {
     renderBoard();
-    expect(screen.getAllByTestId(/column-/i)).toHaveLength(5);
+    expect(await screen.findAllByTestId(/column-/i)).toHaveLength(5);
   });
 
   it("renames a column", async () => {
     renderBoard();
-    const column = getFirstColumn();
+    const columns = await screen.findAllByTestId(/column-/i);
+    const column = columns[0];
     const input = within(column).getByLabelText("Column title");
     await userEvent.clear(input);
     await userEvent.type(input, "New Name");
@@ -33,7 +50,8 @@ describe("KanbanBoard", () => {
 
   it("adds and removes a card", async () => {
     renderBoard();
-    const column = getFirstColumn();
+    const columns = await screen.findAllByTestId(/column-/i);
+    const column = columns[0];
     const addButton = within(column).getByRole("button", {
       name: /add a card/i,
     });
@@ -56,8 +74,8 @@ describe("KanbanBoard", () => {
     expect(within(column).queryByText("New card")).not.toBeInTheDocument();
   });
 
-  it("renders a sign out button", () => {
+  it("renders a sign out button", async () => {
     renderBoard();
-    expect(screen.getByRole("button", { name: /sign out/i })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /sign out/i })).toBeInTheDocument();
   });
 });
