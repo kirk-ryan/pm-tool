@@ -15,6 +15,7 @@ FastAPI backend for the Project Management MVP.
 - `GET /api/board`: Returns the current user's Kanban board data (columns + cards).
 - `PUT /api/board`: Replaces the current user's board data.
 - `POST /api/ai/test`: Sends a prompt to OpenRouter (model: `openai/gpt-oss-120b`) and returns the response. Body: `{"prompt": "..."}` (defaults to `"2+2"`).
+- `POST /api/ai/chat`: Kanban AI chat. Body: `{"board": {...}, "message": "...", "history": [...]}`. Returns `{"response": "...", "board": null | {...}}`. If `board` is non-null, the frontend applies it as a board update.
 
 ## AI (OpenRouter)
 

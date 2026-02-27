@@ -8,7 +8,7 @@ The frontend is a NextJS 16 application with React 19, built as a demo Kanban bo
 
 - `src/components/`: React components for the Kanban board.
 
-  - `KanbanBoard.tsx`: Main component, manages board state, handles drag and drop with @dnd-kit, renders columns.
+  - `KanbanBoard.tsx`: Main component, manages board state, handles drag and drop with @dnd-kit, renders columns. Fetches board from API on load; persists changes via API. Renders `ChatWidget`.
 
   - `KanbanColumn.tsx`: Represents a column, droppable, contains sortable cards, has rename input, card count, NewCardForm.
 
@@ -18,11 +18,15 @@ The frontend is a NextJS 16 application with React 19, built as a demo Kanban bo
 
   - `NewCardForm.tsx`: Form to add new cards, toggles open/closed.
 
+  - `ChatWidget.tsx`: Floating AI chat button (bottom-right FAB) + compact chat panel. Opens on click, closes on backdrop click or close button. Sends messages to `POST /api/ai/chat`; applies board updates when the AI returns one. Maintains conversation history.
+
 - `src/lib/`: Logic.
 
   - `kanban.ts`: Types (Card, Column, BoardData), initialData with sample data, moveCard function for drag logic, createId.
 
   - `kanban.test.ts`: Unit tests for moveCard.
+
+  - `api.ts`: `fetchBoard`, `saveBoard`, `sendChat` — all backend API calls.
 
 - Tests: Unit tests with Vitest, e2e with Playwright.
 

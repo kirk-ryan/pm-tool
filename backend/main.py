@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from ai import ai_query
+from ai import ai_chat, ai_query
 from db import get_board, init_db, set_board
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
@@ -30,6 +30,17 @@ class BoardData(BaseModel):
 
 class AITestRequest(BaseModel):
     prompt: str = "2+2"
+
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    board: dict
+    message: str
+    history: list[ChatMessage] = []
 
 
 # --- API routes ---
@@ -61,6 +72,18 @@ async def ai_test(body: AITestRequest):
     try:
         result = ai_query(body.prompt)
         return {"response": result}
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=502, detail="AI service unavailable")
+
+
+@app.post("/api/ai/chat")
+async def ai_chat_route(body: ChatRequest):
+    try:
+        history = [m.model_dump() for m in body.history]
+        result = ai_chat(body.board, body.message, history)
+        return result
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
     except Exception:

@@ -215,3 +215,110 @@ def test_get_client_uses_openrouter_base_url(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     client = ai_module.get_client()
     assert "openrouter.ai" in str(client.base_url)
+
+
+# ── POST /api/ai/chat ─────────────────────────────────────────────────────────
+
+_SAMPLE_BOARD = {
+    "columns": [{"id": "col-1", "title": "Todo", "cardIds": ["c-1"]}],
+    "cards": {"c-1": {"id": "c-1", "title": "My task", "details": ""}},
+}
+
+
+def test_ai_chat_returns_response(tmp_path):
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_chat", return_value={"response": "You have 1 card.", "board": None}):
+        res = client.post("/api/ai/chat", json={
+            "board": _SAMPLE_BOARD,
+            "message": "What's on my board?",
+        })
+    assert res.status_code == 200
+    assert res.json()["response"] == "You have 1 card."
+    assert res.json()["board"] is None
+
+
+def test_ai_chat_returns_board_update(tmp_path):
+    updated_board = {
+        "columns": [{"id": "col-1", "title": "Todo", "cardIds": ["c-1", "c-2"]}],
+        "cards": {
+            "c-1": {"id": "c-1", "title": "My task", "details": ""},
+            "c-2": {"id": "c-2", "title": "New task", "details": "Added by AI"},
+        },
+    }
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_chat", return_value={"response": "Added a card.", "board": updated_board}):
+        res = client.post("/api/ai/chat", json={
+            "board": _SAMPLE_BOARD,
+            "message": "Add a new task called 'New task'",
+        })
+    assert res.status_code == 200
+    data = res.json()
+    assert data["response"] == "Added a card."
+    assert data["board"] is not None
+    assert len(data["board"]["columns"][0]["cardIds"]) == 2
+
+
+def test_ai_chat_passes_history(tmp_path):
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_chat", return_value={"response": "ok", "board": None}) as mock:
+        client.post("/api/ai/chat", json={
+            "board": _SAMPLE_BOARD,
+            "message": "follow-up",
+            "history": [
+                {"role": "user", "content": "first question"},
+                {"role": "assistant", "content": "first answer"},
+            ],
+        })
+    _, kwargs = mock.call_args
+    history = mock.call_args[0][2]
+    assert len(history) == 2
+    assert history[0]["role"] == "user"
+
+
+def test_ai_chat_missing_key_returns_500(tmp_path):
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_chat", side_effect=ValueError("OPENROUTER_API_KEY environment variable is not set")):
+        res = client.post("/api/ai/chat", json={"board": _SAMPLE_BOARD, "message": "hi"})
+    assert res.status_code == 500
+
+
+def test_ai_chat_network_error_returns_502(tmp_path):
+    client = make_client(tmp_path / "test.db")
+    with patch("main.ai_chat", side_effect=RuntimeError("network error")):
+        res = client.post("/api/ai/chat", json={"board": _SAMPLE_BOARD, "message": "hi"})
+    assert res.status_code == 502
+
+
+# ── ai_chat unit tests ────────────────────────────────────────────────────────
+
+def test_ai_chat_builds_correct_messages(monkeypatch):
+    import ai as ai_module
+    import json
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    mock_response = MagicMock()
+    mock_response.choices[0].message.content = json.dumps({
+        "response": "You have 1 card.",
+        "board": None,
+    })
+    mock_client = MagicMock()
+    mock_client.chat.completions.create.return_value = mock_response
+
+    with patch.object(ai_module, "get_client", return_value=mock_client):
+        result = ai_module.ai_chat(
+            _SAMPLE_BOARD,
+            "What's on my board?",
+            [{"role": "user", "content": "hi"}, {"role": "assistant", "content": "hello"}],
+        )
+
+    assert result["response"] == "You have 1 card."
+    assert result["board"] is None
+
+    call_messages = mock_client.chat.completions.create.call_args[1]["messages"]
+    assert call_messages[0]["role"] == "system"
+    assert "col-1" in call_messages[0]["content"]  # board injected in system prompt
+    assert call_messages[1]["role"] == "user"       # history[0]
+    assert call_messages[2]["role"] == "assistant"  # history[1]
+    assert call_messages[3]["role"] == "user"       # current message
+    assert call_messages[3]["content"] == "What's on my board?"

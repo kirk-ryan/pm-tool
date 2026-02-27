@@ -14,3 +14,21 @@ export async function saveBoard(data: BoardData): Promise<void> {
   });
   if (!res.ok) throw new Error(`PUT /api/board failed: ${res.status}`);
 }
+
+export type ChatMessage = { role: "user" | "assistant"; content: string };
+
+export type ChatResponse = { response: string; board: BoardData | null };
+
+export async function sendChat(
+  board: BoardData,
+  message: string,
+  history: ChatMessage[]
+): Promise<ChatResponse> {
+  const res = await fetch("/api/ai/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ board, message, history }),
+  });
+  if (!res.ok) throw new Error(`POST /api/ai/chat failed: ${res.status}`);
+  return res.json() as Promise<ChatResponse>;
+}

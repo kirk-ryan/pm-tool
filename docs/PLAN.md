@@ -143,11 +143,11 @@
 **Objective:** Extend AI to process Kanban JSON + user questions, return structured outputs with optional board updates.
 
 **Substeps:**
-- [ ] Define structured output schema for AI (response text + optional board changes).
-- [ ] Update AI route to accept board JSON, user question, conversation history.
-- [ ] Parse AI response, apply board updates if present.
-- [ ] Add conversation history management.
-- [ ] Thoroughly test AI responses and board updates.
+- [x] Define structured output schema for AI (response text + optional board changes).
+- [x] Update AI route to accept board JSON, user question, conversation history.
+- [x] Parse AI response, apply board updates if present.
+- [x] Add conversation history management.
+- [x] Thoroughly test AI responses and board updates.
 
 **Tests:**
 - Unit: AI parsing and update logic tested.
@@ -157,18 +157,19 @@
 
 ## Part 10: AI chat UI
 
-**Objective:** Add sidebar chat widget for AI interaction, auto-refresh UI on board updates.
+**Objective:** Add a floating chat button (bottom-right corner) that opens a compact chat panel for AI interaction, auto-refresh board on AI-driven updates.
 
 **Substeps:**
-- [ ] Design and implement chat sidebar component.
-- [ ] Integrate with AI API, display conversation.
-- [ ] Handle board updates from AI, trigger UI refresh.
-- [ ] Add chat input, send messages.
-- [ ] Style beautifully per color scheme.
+- [x] Design and implement floating action button (FAB) component — circular, bottom-right, chat icon.
+- [x] Implement chat panel that opens/closes when FAB is clicked — compact overlay, not a sidebar.
+- [x] Integrate with AI API, display conversation history (user + AI messages).
+- [x] Handle board updates from AI response, trigger UI refresh without page reload.
+- [x] Add chat input with send button (Enter to send).
+- [x] Style per existing color scheme; panel dismisses on backdrop click or close button.
 - [ ] Test full chat flow.
 
 **Tests:**
 - Unit: Chat components tested.
 - E2e: Complete chat interaction, board updates reflect in UI.
 
-**Success Criteria:** Sidebar chat works, AI updates board and UI refreshes, all tests pass.
+**Success Criteria:** Floating button opens chat panel, AI responds and optionally updates the board, UI refreshes, all tests pass.

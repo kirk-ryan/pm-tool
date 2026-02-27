@@ -1,10 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-<<<<<<< HEAD
-import { AuthProvider } from "@/lib/auth";
-import { KanbanBoard } from "@/components/KanbanBoard";
-
-=======
 import { vi } from "vitest";
 import { AuthProvider } from "@/lib/auth";
 import { KanbanBoard } from "@/components/KanbanBoard";
@@ -24,9 +19,9 @@ const mockBoard = vi.hoisted(() => ({
 vi.mock("@/lib/api", () => ({
   fetchBoard: vi.fn().mockResolvedValue(mockBoard),
   saveBoard: vi.fn().mockResolvedValue(undefined),
+  sendChat: vi.fn().mockResolvedValue({ response: "ok", board: null }),
 }));
 
->>>>>>> wip
 const renderBoard = () =>
   render(
     <AuthProvider>
@@ -34,38 +29,20 @@ const renderBoard = () =>
     </AuthProvider>
   );
 
-<<<<<<< HEAD
-const getFirstColumn = () => screen.getAllByTestId(/column-/i)[0];
-=======
-beforeEach(() => {
-  sessionStorage.clear();
-});
->>>>>>> wip
-
 beforeEach(() => {
   sessionStorage.clear();
 });
 
 describe("KanbanBoard", () => {
-<<<<<<< HEAD
-  it("renders five columns", () => {
-    renderBoard();
-    expect(screen.getAllByTestId(/column-/i)).toHaveLength(5);
-=======
   it("renders five columns", async () => {
     renderBoard();
     expect(await screen.findAllByTestId(/column-/i)).toHaveLength(5);
->>>>>>> wip
   });
 
   it("renames a column", async () => {
     renderBoard();
-<<<<<<< HEAD
-    const column = getFirstColumn();
-=======
     const columns = await screen.findAllByTestId(/column-/i);
     const column = columns[0];
->>>>>>> wip
     const input = within(column).getByLabelText("Column title");
     await userEvent.clear(input);
     await userEvent.type(input, "New Name");
@@ -74,12 +51,8 @@ describe("KanbanBoard", () => {
 
   it("adds and removes a card", async () => {
     renderBoard();
-<<<<<<< HEAD
-    const column = getFirstColumn();
-=======
     const columns = await screen.findAllByTestId(/column-/i);
     const column = columns[0];
->>>>>>> wip
     const addButton = within(column).getByRole("button", {
       name: /add a card/i,
     });
@@ -102,14 +75,8 @@ describe("KanbanBoard", () => {
     expect(within(column).queryByText("New card")).not.toBeInTheDocument();
   });
 
-<<<<<<< HEAD
-  it("renders a sign out button", () => {
-    renderBoard();
-    expect(screen.getByRole("button", { name: /sign out/i })).toBeInTheDocument();
-=======
   it("renders a sign out button", async () => {
     renderBoard();
     expect(await screen.findByRole("button", { name: /sign out/i })).toBeInTheDocument();
->>>>>>> wip
   });
 });

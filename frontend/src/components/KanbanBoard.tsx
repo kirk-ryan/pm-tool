@@ -13,12 +13,9 @@ import {
 } from "@dnd-kit/core";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
-<<<<<<< HEAD
-import { createId, initialData, moveCard, type BoardData } from "@/lib/kanban";
-=======
+import { ChatWidget } from "@/components/ChatWidget";
 import { createId, moveCard, type BoardData } from "@/lib/kanban";
 import { fetchBoard, saveBoard } from "@/lib/api";
->>>>>>> wip
 import { useAuth } from "@/lib/auth";
 
 export const KanbanBoard = () => {
@@ -27,8 +24,6 @@ export const KanbanBoard = () => {
   const [saveError, setSaveError] = useState(false);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const { logout } = useAuth();
-<<<<<<< HEAD
-=======
 
   useEffect(() => {
     fetchBoard()
@@ -38,7 +33,6 @@ export const KanbanBoard = () => {
       })
       .catch(() => setStatus("error"));
   }, []);
->>>>>>> wip
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -215,6 +209,8 @@ export const KanbanBoard = () => {
           </DragOverlay>
         </DndContext>
       </main>
+
+      <ChatWidget board={board} onBoardUpdate={persist} />
     </div>
   );
 };
